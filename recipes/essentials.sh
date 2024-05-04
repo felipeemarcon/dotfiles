@@ -12,6 +12,7 @@ function install_essentials {
       "gh"
       "glow"
       "fzf"
+      "warp"
    )
 
    for pkg in "${packages[@]}"; do

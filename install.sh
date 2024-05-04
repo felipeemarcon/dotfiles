@@ -25,13 +25,13 @@ source recipes/pnpm.sh
 shopt -s expand_aliases
 
 declare -A options;
-for opt in $@; do 
+for opt in $@; do
    if [[ $opt == --* ]]; then
       options[${opt:2}]=true
    fi
 done
 
-logfile="peam_dotfiles_$(date +%Y%m%d_%H%M%S).log"
+logfile="marcon_dotfiles_$(date +%Y%m%d_%H%M%S).log"
 
 function _ {
    [ "$1" = log ] || log debug  -- "running command: $@" &>> $logfile
@@ -112,7 +112,7 @@ if [[ ${options[skip-sources]} != true ]]; then
       if [ "$installed_sum" != "$sources_sum" ]; then
          log info "source file is outdated. overwriting"
          cp "$HOME/.bashrc" "$HOME/.bashrc.bak"
-         
+
          awk -v replacement="$(<"./dots/sources.sh")" '
             $0 ~ start {print replacement; skip = 1}
             $0 ~ end {skip = 0; next}
@@ -143,7 +143,7 @@ if [[ ${options[skip-dependencies]} != true ]]; then
    dependencies+=( "pnpm" )
    dependencies+=( "node" )
 
-   for dep in "${dependencies[@]}"; do 
+   for dep in "${dependencies[@]}"; do
       log info "running $dep recipe"
       eval install_$dep
       source $HOME/.bashrc
@@ -155,16 +155,16 @@ fi
 if [[ ${options[skip-dots]} != true ]]; then
    log info "configuring dotfiles"
 
-   declare -A dots=( 
-      ["vscode-settings.json"]="$HOME/.config/Code/User/settings.json"
-      ["keybindings.json"]="$HOME/.config/Code/User/keybindings.json"
+   declare -A dots=(
+      ["vscode-settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+      ["warp_keybindings.json"]="$HOME/.warp/keybindings.yaml"
       [".gitconfig"]="$HOME/.gitconfig"
       ["aliases.sh"]="/usr/bin/peam-commands"
       [".inputrc"]="$HOME/.inputrc"
       [".tmux.config"]="$HOME/.tmux.config"
    )
 
-   for dotfile in "${!dots[@]}"; do 
+   for dotfile in "${!dots[@]}"; do
       dotfile_path=${dots[$dotfile]}
       mkdir -p $(dirname $dotfile_path)
 
@@ -172,7 +172,7 @@ if [[ ${options[skip-dots]} != true ]]; then
          cp dots/$dotfile ./tmp/$dotfile
       else
          log info "fetching dot $dotfile"
-         curl -o ./tmp/$dotfile https://raw.githubusercontent.com/pmqueiroz/dotfiles/master/dots/$dotfile
+         curl -o ./tmp/$dotfile https://raw.githubusercontent.com/felipeemarcon/dotfiles/master/dots/$dotfile
       fi
 
       log info "setting dot $dotfile"

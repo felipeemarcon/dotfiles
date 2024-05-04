@@ -4,9 +4,10 @@ shopt -s expand_aliases
 function install_code {
    if ! command -v code &> /dev/null; then
       log info downloading vscode
-      loader curl -s -L -o "code_amd64.deb" "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+      loader curl -s -L -o "VSCode-darwin-universal.zip" "https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal"
       log info installing vscode
-      _ sudo dpkg -i ./code_amd64.deb
+      _ unzip ./VSCode-darwin-universal.zip
+      _ mv Visual\ Studio\ Code.app Applications
 
       if [ $? -ne 0 ]; then
          log error "failed to install vscode"

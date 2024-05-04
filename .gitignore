@@ -1,4 +1,6 @@
-code_amd64.deb
+VSCode-darwin-universal.zip
+Visual\ Studio\ Code.app
 bundler
 /tmp/
 *.log
+.DS_Store
