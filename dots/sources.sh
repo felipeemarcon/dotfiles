@@ -1,5 +1,5 @@
 # ---BEGIN DOTFILES SOURCE---
-source /usr/bin/peam-commands
+source $HOME/.marcon-commands
 source $HOME/.asdf/asdf.sh
 source $HOME/.asdf/completions/asdf.bash
 

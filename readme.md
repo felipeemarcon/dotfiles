@@ -27,7 +27,7 @@ Before running this script make sure you have the following installed:
 ### Run
 
 ```sh
-$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/pmqueiroz/dotfiles/release/install.sh)"
+$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/felipeemarcon/dotfiles/release/install.sh)"
 ```
 > **Warning** This script must be used in a sudoer user, otherwise it will not work at all.
 
@@ -45,6 +45,6 @@ $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/pmqueiroz/dotfile
 
 <div align="center">
 
-<samp>Made with :heart: by [**Peam**][peam-url]</samp> 
+<samp>Made with :heart: by [**Peam**][peam-url]</samp>
 
 </div>

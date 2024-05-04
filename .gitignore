@@ -1,4 +1,6 @@
-code_amd64.deb
+*.dmg
+Visual\ Studio\ Code.app
 bundler
 /tmp/
 *.log
+.DS_Store

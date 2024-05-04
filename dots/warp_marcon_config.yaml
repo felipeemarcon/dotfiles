@@ -1,0 +1,43 @@
+# Warp Launch Configuration
+#
+#
+# Use this to start a certain configuration of windows, tabs, and panes.
+# Open the launch configuration palette to access and open any launch configuration.
+#
+# This file defines your launch configuration.
+# More on how to do so here:
+# https://docs.warp.dev/features/session-management/launch-configurations
+#
+# All launch configurations are stored under ~/.warp/launch_configurations.
+# Edit them anytime!
+#
+# You can also add commands that run on-start for your launch configurations like so:
+# ---
+# name: Example with Command
+# windows:
+#  - tabs:
+#      - layout:
+#          cwd: /Users/warp-user/project
+#          commands:
+#            - exec: code .
+
+---
+name: Marcon Config
+windows:
+  - tabs:
+      - title: Jade Web
+        layout:
+          cwd: /Users/felipe.marcon/projects/stone/jade-web
+      - title: Jade Design Tokens
+        layout:
+          cwd: /Users/felipe.marcon/projects/stone/jade-design-tokens
+      - title: iOS
+        layout:
+          cwd: /Users/felipe.marcon/projects/stone/mobile-banking-ios
+      - title: Android
+        layout:
+          cwd: /Users/felipe.marcon/projects/stone/mobile-banking-android
+      - layout:
+          cwd: /Users/felipe.marcon/projects/dotfiles/dots
+      - layout:
+          cwd: /Users/felipe.marcon/.warp

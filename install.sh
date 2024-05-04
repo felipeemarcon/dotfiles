@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if ! command -v brew &> /dev/null; then
    log fatal "brew is not installed. Please install Homebrew first."
    exit 1
@@ -21,20 +21,22 @@ source recipes/code.sh
 source recipes/essentials.sh
 source recipes/node.sh
 source recipes/pnpm.sh
+source recipes/npx.sh
+source recipes/warp_themes.sh
 
 shopt -s expand_aliases
 
 declare -A options;
-for opt in $@; do 
+for opt in $@; do
    if [[ $opt == --* ]]; then
       options[${opt:2}]=true
    fi
 done
 
-logfile="peam_dotfiles_$(date +%Y%m%d_%H%M%S).log"
+logfile="marcon_dotfiles_$(date +%Y%m%d_%H%M%S).log"
 
 function _ {
-   [ "$1" = log ] || log debug  -- "running command: $@" &>> $logfile
+   [ "$1" = log ] || log debug -- "running command: $@" &>> $logfile
    [ "${options[verbose]}" = true ] && eval $@ || eval $@ &>> $logfile
 }
 
@@ -103,7 +105,7 @@ if [[ ${options[skip-sources]} != true ]]; then
    END_PATTERN="# ---END DOTFILES SOURCE---"
 
    installed_sources=$(mktemp)
-   awk "/${START_PATTERN}/,/${END_PATTERN}/" "$HOME/.bashrc" > $installed_sources
+   awk "/${START_PATTERN}/,/${END_PATTERN}/" "$HOME/.profile" > $installed_sources
 
    if [ -s $installed_sources ];then
       installed_sum=$(checksum $installed_sources)
@@ -111,20 +113,20 @@ if [[ ${options[skip-sources]} != true ]]; then
 
       if [ "$installed_sum" != "$sources_sum" ]; then
          log info "source file is outdated. overwriting"
-         cp "$HOME/.bashrc" "$HOME/.bashrc.bak"
-         
+         cp "$HOME/.profile" "$HOME/.profile.bak"
+
          awk -v replacement="$(<"./dots/sources.sh")" '
             $0 ~ start {print replacement; skip = 1}
             $0 ~ end {skip = 0; next}
             !skip
-         ' start="$START_PATTERN" end="$END_PATTERN" "$HOME/.bashrc.bak" > "$HOME/.bashrc"
+         ' start="$START_PATTERN" end="$END_PATTERN" "$HOME/.profile.bak" > "$HOME/.profile"
       else
          log warn "installed sources is ok. skip bash sources"
       fi
    else
       log info "adding sources to bash config file"
-      echo >> "$HOME/.bashrc"
-      cat ./dots/sources.sh >> "$HOME/.bashrc"
+      echo >> "$HOME/.profile"
+      cat ./dots/sources.sh >> "$HOME/.profile"
    fi
 
    rm -rf $installed_sources
@@ -140,13 +142,15 @@ if [[ ${options[skip-dependencies]} != true ]]; then
    dependencies+=( "essentials" )
    dependencies+=( "asdf" )
    dependencies+=( "code" )
-   dependencies+=( "pnpm" )
    dependencies+=( "node" )
+   dependencies+=( "pnpm" )
+   dependencies+=( "npx" )
+   dependencies+=( "warp_themes" )
 
-   for dep in "${dependencies[@]}"; do 
+   for dep in "${dependencies[@]}"; do
       log info "running $dep recipe"
       eval install_$dep
-      source $HOME/.bashrc
+      source $HOME/.profile
    done
 else
    log warn "skip dependencies install"
@@ -155,31 +159,37 @@ fi
 if [[ ${options[skip-dots]} != true ]]; then
    log info "configuring dotfiles"
 
-   declare -A dots=( 
-      ["vscode-settings.json"]="$HOME/.config/Code/User/settings.json"
-      ["keybindings.json"]="$HOME/.config/Code/User/keybindings.json"
+   declare -A dots=(
+      ["vscode-settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+      ["warp_keybindings.yaml"]="$HOME/.warp/keybindings.yaml"
       [".gitconfig"]="$HOME/.gitconfig"
-      ["aliases.sh"]="/usr/bin/peam-commands"
+      ["aliases.sh"]="$HOME/.marcon-commands"
+      [".zshrc"]="$HOME/.zshrc"
       [".inputrc"]="$HOME/.inputrc"
-      [".tmux.config"]="$HOME/.tmux.config"
    )
 
-   for dotfile in "${!dots[@]}"; do 
+   for dotfile in "${!dots[@]}"; do
       dotfile_path=${dots[$dotfile]}
       mkdir -p $(dirname $dotfile_path)
 
       if git rev-parse --git-dir > /dev/null 2>&1; then
-         cp dots/$dotfile ./tmp/$dotfile
+         cp dots/$dotfile tmp/$dotfile
       else
          log info "fetching dot $dotfile"
-         curl -o ./tmp/$dotfile https://raw.githubusercontent.com/pmqueiroz/dotfiles/master/dots/$dotfile
+         curl -o ./tmp/$dotfile https://raw.githubusercontent.com/felipeemarcon/dotfiles/master/dots/$dotfile
       fi
 
       log info "setting dot $dotfile"
-      cat ./dots/$dotfile | render_string username $user_name email $user_email > ./tmp/$dotfile
-      sudo cp ./tmp/$dotfile $dotfile_path
-      sudo chmod a+w $dotfile_path
-      sudo chmod a+r $dotfile_path
+      cat dots/$dotfile | render_string username $user_name email $user_email > tmp/$dotfile
+      if [ -f "$dotfile_path" ]; then
+         log info "moving $dotfile"
+         sudo cp -R tmp/$dotfile "$dotfile_path"
+         sudo chmod a+w "$dotfile_path"
+         sudo chmod a+r "$dotfile_path"
+      else
+         log info "$dotfile already exists. Skipping"
+      fi
+
    done
 else
    log warn "skip settings install"
